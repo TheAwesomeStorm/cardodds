@@ -1,6 +1,6 @@
 # cardodds
 
-**cardodds** is a CLI tool that calculates the probability of drawing **at least one** specific card (a "source") from a deck after drawing a given number of cards — also known as a **hypergeometric probability**.
+**cardodds** is a CLI tool that calculates hypergeometric probabilities for card games — the chance of drawing **at least k** copies of a specific card (a "source") from a deck after drawing a given number of cards.
 
 This is commonly used in trading card games (TCGs) like *Magic: The Gathering*, *Yu-Gi-Oh!*, *Pokémon TCG*, and *Hearthstone* to determine the likelihood of having a key card in your opening hand.
 
@@ -8,21 +8,24 @@ This is commonly used in trading card games (TCGs) like *Magic: The Gathering*, 
 
 ## The Math
 
-The probability of drawing at least 1 source card is calculated using the **hypergeometric distribution**:
+The probability of drawing **at least k** source cards follows the **hypergeometric distribution**, computed via a recurrence relation:
 
-P(at least 1) = 1 − ∏_{i=0}^{n−1} (N − K − i) / (N − i)
+P(X = 0) = ∏_{i=0}^{n−1} (N − K − i) / (N − i)
+
+P(X = m + 1) = P(X = m) × (K − m)(n − m) / ((m + 1)(N − K − n + m + 1))
+
+P(X ≥ k) = 1 − Σ_{i=0}^{k−1} P(X = i)
 
 Where:
 
 - **N** — total number of cards in the deck
 - **n** — number of cards drawn
 - **K** — number of source cards in the deck
+- **k** — minimum number of source cards desired in hand
 
-This is equivalent to: **1 − P(X = 0)**, where X is the number of source cards drawn.
+### Worked Example (k = 1)
 
-### Worked Example
-
-**Input:** N = 60, n = 7, K = 4
+**Input:** N = 60, n = 7, K = 4, k = 1
 
 P(at least 1) = 1 − (56/60 × 55/59 × 54/58 × 53/57 × 52/56 × 51/55 × 50/54)
 
@@ -37,13 +40,15 @@ Result: **≈ 0.3995** (≈ 39.95%)
 | N        | Total cards in deck | 60 |
 | n        | Number of cards drawn | 7 |
 | K        | Number of source cards in deck | 4 |
+| k        | Minimum desired source cards in hand | 1 |
 
 ## Output
 
-A single decimal value between 0 and 1 representing the probability.
+A formatted line showing the result:
 
 ```
-0.3995
+Probability of having at least 1 card in hand: 0.3995
+Probability of having at least 2 cards in hand: 0.0632
 ```
 
 ---
@@ -104,32 +109,33 @@ Two modes — **interactive** (default) or **CLI arguments**.
 
 ### Interactive mode
 
-Run without arguments and enter values at the prompts. Press Enter to accept defaults (60, 7, 4).
+Run without arguments and enter values at the prompts. Press Enter to accept defaults (60, 7, 4, 1).
 
 ```
 > cardodds
 Total cards in deck [60]:
 Cards drawn [7]:
 Source cards in deck [4]:
-Probability: 0.3995
+Minimum desired cards in hand [1]:
+Probability of having at least 1 card in hand: 0.3995
 ```
 
 ### CLI arguments
 
-All arguments are optional — omitted ones default to 60, 7, 4.
+All arguments are optional — omitted ones default to 60, 7, 4, 1.
 
 ```powershell
-cardodds --deck 40 --draw 5 --sources 3
+cardodds --deck 40 --draw 5 --sources 3 --desired 2
 ```
 
 ```powershell
-cardodds --draw 5 --sources 3
+cardodds -N 60 -n 7 -K 4 -k 1
 ```
 
----
+| Short | Long | Default |
+|-------|------|---------|
+| `-N` | `--deck` | 60 |
+| `-n` | `--draw` | 7 |
+| `-K` | `--sources` | 4 |
+| `-k` | `--desired` | 1 |
 
-## Future Plans
-
-- Support for arbitrary k values (e.g., probability of drawing **exactly** 2 sources, or **at least** 3)
-- Cumulative probabilities: P(X = k), P(X ≥ k), P(X ≤ k)
-- Hypergeometric distribution table output
