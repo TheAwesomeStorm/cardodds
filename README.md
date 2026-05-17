@@ -48,7 +48,7 @@ A single decimal value between 0 and 1 representing the probability.
 
 ---
 
-## Building on Windows
+## Building and Installing on Windows
 
 This project is designed to be built and run on **Windows** (the executable is intended for Windows use).
 
@@ -56,26 +56,22 @@ This project is designed to be built and run on **Windows** (the executable is i
 
 Install Rust from [rustup.rs](https://rustup.rs/) if you haven't already. This gives you `cargo` in your terminal (PowerShell, CMD, etc.).
 
-### Build
+### Install (adds to PATH automatically)
 
 ```powershell
 cd C:\Users\mendes\Projects\rust\cardodds
+cargo install --path .
+```
+
+The executable is installed to `%USERPROFILE%\.cargo\bin\cardodds.exe`, which is already in your PATH. You can now run `cardodds` from anywhere.
+
+### Build only (no PATH install)
+
+```powershell
 cargo build --release
 ```
 
-The compiled executable will be at:
-
-```
-target\release\cardodds.exe
-```
-
-You can run it directly:
-
-```powershell
-.\target\release\cardodds.exe
-```
-
-Or add the `target\release` directory to your PATH for quick access.
+The compiled executable will be at `target\release\cardodds.exe`.
 
 ---
 
@@ -104,13 +100,30 @@ This tells Git to use the hooks inside the `.githooks/` directory (which is trac
 
 ## Usage
 
-The program will prompt you for the three inputs interactively:
+Two modes — **interactive** (default) or **CLI arguments**.
+
+### Interactive mode
+
+Run without arguments and enter values at the prompts. Press Enter to accept defaults (60, 7, 4).
 
 ```
-Enter total cards in deck: 60
-Enter cards drawn: 7
-Enter source cards in deck: 4
+> cardodds
+Total cards in deck [60]:
+Cards drawn [7]:
+Source cards in deck [4]:
 Probability: 0.3995
+```
+
+### CLI arguments
+
+All arguments are optional — omitted ones default to 60, 7, 4.
+
+```powershell
+cardodds --deck 40 --draw 5 --sources 3
+```
+
+```powershell
+cardodds --draw 5 --sources 3
 ```
 
 ---
@@ -119,5 +132,4 @@ Probability: 0.3995
 
 - Support for arbitrary k values (e.g., probability of drawing **exactly** 2 sources, or **at least** 3)
 - Cumulative probabilities: P(X = k), P(X ≥ k), P(X ≤ k)
-- Non-interactive mode via command-line arguments (e.g., `cardodds --deck 60 --draw 7 --source 4`)
 - Hypergeometric distribution table output
