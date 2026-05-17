@@ -79,6 +79,29 @@ Or add the `target\release` directory to your PATH for quick access.
 
 ---
 
+## Pre-commit Hooks
+
+This repository includes a pre-commit hook that runs `cargo fmt --check` and `cargo clippy` automatically before each commit.
+
+### Install
+
+From PowerShell, CMD, or WSL, run:
+
+```powershell
+git config core.hooksPath .githooks
+```
+
+This tells Git to use the hooks inside the `.githooks/` directory (which is tracked in the repo). Only needs to be done once per clone.
+
+### What it checks
+
+| Check | Command | Fails if... |
+|-------|---------|-------------|
+| Formatting | `cargo fmt --check` | Code doesn't match rustfmt style |
+| Lints | `cargo clippy -- -D warnings` | Any clippy or compiler warning exists |
+
+---
+
 ## Usage
 
 The program will prompt you for the three inputs interactively:
