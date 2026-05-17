@@ -1,3 +1,6 @@
+use cardodds::hypergeometric::probability_at_least_one;
+
 fn main() {
-    println!("cardodds — coming soon!");
+    let prob = probability_at_least_one(60, 7, 4);
+    println!("{:.4}", prob);
 }
