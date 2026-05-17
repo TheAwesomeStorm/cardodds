@@ -1,5 +1,5 @@
 use crate::hypergeometric;
-use crate::input::{DeckSize, DesiredCount, DrawCount, SourceCount};
+use crate::input::{DeckSize, DesiredCount, DrawCount, PoolDrawn, PoolSize, SourceCount};
 
 /// Probability of drawing at least `desired` source cards, given a deck of
 /// `deck` cards, drawing `draw` cards, with `sources` total copies in the deck.
@@ -24,6 +24,27 @@ pub fn probability_at_least_k(
     desired: &DesiredCount,
 ) -> f64 {
     hypergeometric::prob_at_least_k(deck.get(), draw.get(), sources.get(), desired.get())
+}
+
+/// Probability of drawing at least `desired` source cards, given a deck of
+/// `deck` cards, drawing `draw` cards, with `sources` copies inside a pool of
+/// `pool` items, conditioning on at least `pool_drawn` pool items being drawn.
+pub fn conditional_probability(
+    deck: &DeckSize,
+    draw: &DrawCount,
+    pool: &PoolSize,
+    sources: &SourceCount,
+    pool_drawn: &PoolDrawn,
+    desired: &DesiredCount,
+) -> f64 {
+    hypergeometric::conditional_at_least_k(
+        deck.get(),
+        draw.get(),
+        pool.get(),
+        pool_drawn.get(),
+        sources.get(),
+        desired.get(),
+    )
 }
 
 #[cfg(test)]
@@ -113,5 +134,46 @@ mod tests {
         let prob = probability_at_least_k(&d, &n, &s, &des);
         assert!((prob - 0.00007).abs() < 0.01);
         assert!(prob > 0.0);
+    }
+
+    fn make_conditional_inputs(
+        deck: u64,
+        draw: u64,
+        sources: u64,
+        desired: u64,
+        pool: u64,
+        pool_drawn: u64,
+    ) -> (
+        DeckSize,
+        DrawCount,
+        SourceCount,
+        DesiredCount,
+        PoolSize,
+        PoolDrawn,
+    ) {
+        let d = DeckSize::new(deck).unwrap();
+        let s = SourceCount::new(sources, &d).unwrap();
+        let p = PoolSize::new(pool, &d, &s).unwrap();
+        (
+            d,
+            DrawCount::new(draw, &d).unwrap(),
+            s,
+            DesiredCount::new(desired, &s).unwrap(),
+            p,
+            PoolDrawn::new(pool_drawn, &p).unwrap(),
+        )
+    }
+
+    #[test]
+    fn conditional_basic() {
+        let (d, n, s, des, p, pd) = make_conditional_inputs(60, 9, 18, 2, 24, 3);
+        let prob = conditional_probability(&d, &n, &p, &s, &pd, &des);
+        assert!(prob > 0.0 && prob <= 1.0);
+    }
+
+    #[test]
+    fn conditional_zero_draws_returns_zero() {
+        let (d, n, s, des, p, pd) = make_conditional_inputs(60, 0, 18, 2, 24, 3);
+        assert_eq!(conditional_probability(&d, &n, &p, &s, &pd, &des), 0.0);
     }
 }

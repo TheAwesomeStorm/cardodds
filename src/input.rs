@@ -105,6 +105,64 @@ impl fmt::Display for DesiredCount {
     }
 }
 
+/// Total items in the pool. Must be ≥ source count and ≤ deck size.
+#[derive(Debug, Clone, Copy)]
+pub struct PoolSize(u64);
+
+impl PoolSize {
+    pub fn new(value: u64, deck: &DeckSize, sources: &SourceCount) -> Result<Self> {
+        if value > deck.get() {
+            bail!(
+                "pool size ({value}) cannot exceed deck size ({})",
+                deck.get()
+            );
+        }
+        if value < sources.get() {
+            bail!(
+                "pool size ({value}) cannot be less than source count ({})",
+                sources.get()
+            );
+        }
+        Ok(Self(value))
+    }
+
+    pub fn get(&self) -> u64 {
+        self.0
+    }
+}
+
+impl fmt::Display for PoolSize {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+/// Minimum number of pool items drawn that we condition on. Must be ≤ pool size.
+#[derive(Debug, Clone, Copy)]
+pub struct PoolDrawn(u64);
+
+impl PoolDrawn {
+    pub fn new(value: u64, pool: &PoolSize) -> Result<Self> {
+        if value > pool.get() {
+            bail!(
+                "pool drawn ({value}) cannot exceed pool size ({})",
+                pool.get()
+            );
+        }
+        Ok(Self(value))
+    }
+
+    pub fn get(&self) -> u64 {
+        self.0
+    }
+}
+
+impl fmt::Display for PoolDrawn {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -173,5 +231,44 @@ mod tests {
         let deck = DeckSize::new(60).unwrap();
         let sources = SourceCount::new(4, &deck).unwrap();
         assert!(DesiredCount::new(5, &sources).is_err());
+    }
+
+    #[test]
+    fn valid_pool_size() {
+        let deck = DeckSize::new(60).unwrap();
+        let sources = SourceCount::new(18, &deck).unwrap();
+        let pool = PoolSize::new(24, &deck, &sources).unwrap();
+        assert_eq!(pool.get(), 24);
+    }
+
+    #[test]
+    fn pool_size_exceeding_deck_rejected() {
+        let deck = DeckSize::new(60).unwrap();
+        let sources = SourceCount::new(18, &deck).unwrap();
+        assert!(PoolSize::new(61, &deck, &sources).is_err());
+    }
+
+    #[test]
+    fn pool_size_less_than_sources_rejected() {
+        let deck = DeckSize::new(60).unwrap();
+        let sources = SourceCount::new(18, &deck).unwrap();
+        assert!(PoolSize::new(10, &deck, &sources).is_err());
+    }
+
+    #[test]
+    fn valid_pool_drawn() {
+        let deck = DeckSize::new(60).unwrap();
+        let sources = SourceCount::new(18, &deck).unwrap();
+        let pool = PoolSize::new(24, &deck, &sources).unwrap();
+        let drawn = PoolDrawn::new(3, &pool).unwrap();
+        assert_eq!(drawn.get(), 3);
+    }
+
+    #[test]
+    fn pool_drawn_exceeding_pool_rejected() {
+        let deck = DeckSize::new(60).unwrap();
+        let sources = SourceCount::new(18, &deck).unwrap();
+        let pool = PoolSize::new(24, &deck, &sources).unwrap();
+        assert!(PoolDrawn::new(25, &pool).is_err());
     }
 }
