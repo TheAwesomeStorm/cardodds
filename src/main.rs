@@ -1,5 +1,5 @@
 use anyhow::Result;
-use cardodds::hypergeometric::probability_at_least_k;
+use cardodds::domain::probability_at_least_k;
 use cardodds::input::{DeckSize, DesiredCount, DrawCount, SourceCount};
 use clap::Parser;
 use dialoguer::Input;
