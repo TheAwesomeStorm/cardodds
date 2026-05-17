@@ -10,16 +10,16 @@ use dialoguer::Input;
     about = "Calculate hypergeometric probabilities for card games"
 )]
 struct Args {
-    #[arg(long, help = "Total cards in the deck")]
+    #[arg(short = 'N', long, help = "Total cards in the deck")]
     deck: Option<u64>,
 
-    #[arg(long, help = "Number of cards drawn")]
+    #[arg(short = 'n', long, help = "Number of cards drawn")]
     draw: Option<u64>,
 
-    #[arg(long, help = "Number of source cards in the deck")]
+    #[arg(short = 'K', long, help = "Number of source cards in the deck")]
     sources: Option<u64>,
 
-    #[arg(long, help = "Minimum number of desired cards in hand")]
+    #[arg(short = 'k', long, help = "Minimum number of desired cards in hand")]
     desired: Option<u64>,
 }
 
