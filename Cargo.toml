@@ -1,0 +1,5 @@
+[package]
+name = "cardodds"
+version = "0.1.0"
+edition = "2021"
+description = "CLI tool to calculate hypergeometric probabilities for card games"
