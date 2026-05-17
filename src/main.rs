@@ -111,6 +111,12 @@ fn main() -> Result<()> {
                     .interact_text()?;
                 let sources = SourceCount::new(sources_val, &deck)?;
 
+                let desired_val: u64 = Input::new()
+                    .with_prompt("Minimum desired cards in hand")
+                    .default(1)
+                    .interact_text()?;
+                let desired = DesiredCount::new(desired_val, &sources)?;
+
                 let pool_val: u64 = Input::new()
                     .with_prompt("Total cards in the pool")
                     .default(24)
@@ -122,12 +128,6 @@ fn main() -> Result<()> {
                     .default(3)
                     .interact_text()?;
                 let pool_drawn = PoolDrawn::new(pool_drawn_val, &pool)?;
-
-                let desired_val: u64 = Input::new()
-                    .with_prompt("Minimum desired cards in hand")
-                    .default(1)
-                    .interact_text()?;
-                let desired = DesiredCount::new(desired_val, &sources)?;
 
                 let prob =
                     conditional_probability(&deck, &draw, &pool, &sources, &pool_drawn, &desired);
