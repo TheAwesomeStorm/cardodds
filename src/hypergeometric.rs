@@ -20,11 +20,7 @@ use crate::input::{DeckSize, DrawCount, SourceCount};
 /// let rounded = (prob * 10000.0).round() / 10000.0;
 /// assert_eq!(rounded, 0.3995);
 /// ```
-pub fn probability_at_least_one(
-    deck: &DeckSize,
-    draw: &DrawCount,
-    sources: &SourceCount,
-) -> f64 {
+pub fn probability_at_least_one(deck: &DeckSize, draw: &DrawCount, sources: &SourceCount) -> f64 {
     let d = deck.get();
     let n = draw.get();
     let k = sources.get();

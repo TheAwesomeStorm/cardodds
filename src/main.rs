@@ -5,7 +5,10 @@ use clap::Parser;
 use dialoguer::Input;
 
 #[derive(Parser)]
-#[command(version, about = "Calculate hypergeometric probabilities for card games")]
+#[command(
+    version,
+    about = "Calculate hypergeometric probabilities for card games"
+)]
 struct Args {
     #[arg(long, help = "Total cards in the deck")]
     deck: Option<u64>,
